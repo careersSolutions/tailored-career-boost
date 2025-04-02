@@ -1,11 +1,11 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { createClient } from '@supabase/supabase-js';
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
+import { supabase } from '@/utils/supabaseClient';
+
 import Index from "./pages/Index";
 import CVReview from "./pages/CVReview";
 import Pricing from "./pages/Pricing";
@@ -34,13 +34,6 @@ import Customers from "./pages/dashboard/Customers";
 import Settings from "./pages/dashboard/Settings";
 
 const queryClient = new QueryClient();
-
-// Initialize Supabase client with the provided credentials
-const supabaseUrl = "https://qjboemhffxyuddtwkyin.supabase.co";
-const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqYm9lbWhmZnh5dWRkdHdreWluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM1OTQ0MzksImV4cCI6MjA1OTE3MDQzOX0.UI_COubAoMovm8ffJWP1H-RObbS8NP7pntMeCIvpEY4";
-
-// Create Supabase client
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const App = () => {
   return (

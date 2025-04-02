@@ -2,8 +2,13 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client with the provided credentials
-const supabaseUrl = "https://qjboemhffxyuddtwkyin.supabase.co";
-const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqYm9lbWhmZnh5dWRkdHdreWluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM1OTQ0MzksImV4cCI6MjA1OTE3MDQzOX0.UI_COubAoMovm8ffJWP1H-RObbS8NP7pntMeCIvpEY4";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://qjboemhffxyuddtwkyin.supabase.co";
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqYm9lbWhmZnh5dWRkdHdreWluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM1OTQ0MzksImV4cCI6MjA1OTE3MDQzOX0.UI_COubAoMovm8ffJWP1H-RObbS8NP7pntMeCIvpEY4";
+
+// Validate Supabase credentials
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase configuration. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY');
+}
 
 // Create Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
