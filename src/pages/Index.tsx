@@ -48,7 +48,7 @@ const HomePage = () => {
                   </Button>
                 </Link>
                 <Link to="/services/cv-writing">
-                  <Button variant="outline" className="border-white hover:bg-white/10 px-8 py-6 text-lg w-full sm:w-auto text-cyan-300">
+                  <Button variant="outline" className="border-white px-8 py-6 w-full sm:w-auto text-lg text-slate-950 bg-sky-300 hover:bg-sky-200">
                     Our Services
                   </Button>
                 </Link>
