@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -7,35 +6,28 @@ import ServiceCard from '@/components/ServiceCard';
 import TestimonialCard from '@/components/TestimonialCard';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-
 const HomePage = () => {
   // Sample testimonials data
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      position: "Marketing Director",
-      testimonial: "Career Solutions transformed my CV completely. Within two weeks of using their service, I landed three interviews and secured my dream job as a Marketing Director.",
-      rating: 5,
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
-    },
-    {
-      name: "David Chen",
-      position: "Software Engineer",
-      testimonial: "The LinkedIn optimization service helped me increase profile views by 300%. The team's attention to detail and industry knowledge was impressive.",
-      rating: 5,
-      image: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
-    },
-    {
-      name: "Emma Williams",
-      position: "HR Manager",
-      testimonial: "As someone who reviews CVs daily, I was skeptical about what Career Solutions could offer. They exceeded my expectations with their professional approach and insights.",
-      rating: 4,
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
-    }
-  ];
-
-  return (
-    <>
+  const testimonials = [{
+    name: "Sarah Johnson",
+    position: "Marketing Director",
+    testimonial: "Career Solutions transformed my CV completely. Within two weeks of using their service, I landed three interviews and secured my dream job as a Marketing Director.",
+    rating: 5,
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
+  }, {
+    name: "David Chen",
+    position: "Software Engineer",
+    testimonial: "The LinkedIn optimization service helped me increase profile views by 300%. The team's attention to detail and industry knowledge was impressive.",
+    rating: 5,
+    image: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
+  }, {
+    name: "Emma Williams",
+    position: "HR Manager",
+    testimonial: "As someone who reviews CVs daily, I was skeptical about what Career Solutions could offer. They exceeded my expectations with their professional approach and insights.",
+    rating: 4,
+    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
+  }];
+  return <>
       <Header />
       <main>
         {/* Hero Section */}
@@ -56,7 +48,7 @@ const HomePage = () => {
                   </Button>
                 </Link>
                 <Link to="/services/cv-writing">
-                  <Button variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-6 text-lg w-full sm:w-auto">
+                  <Button variant="outline" className="border-white hover:bg-white/10 px-8 py-6 text-lg w-full sm:w-auto text-cyan-300">
                     Our Services
                   </Button>
                 </Link>
@@ -95,30 +87,10 @@ const HomePage = () => {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <ServiceCard
-                title="CV Writing"
-                description="Professionally written CVs tailored to your industry and career goals."
-                icon={<FileText size={32} />}
-                link="/services/cv-writing"
-              />
-              <ServiceCard
-                title="Cover Letter"
-                description="Compelling cover letters that complement your CV and showcase your value."
-                icon={<PenTool size={32} />}
-                link="/services/cover-letter"
-              />
-              <ServiceCard
-                title="LinkedIn Optimization"
-                description="Strategic profile enhancement to increase visibility to recruiters and employers."
-                icon={<Linkedin size={32} />}
-                link="/services/linkedin-optimization"
-              />
-              <ServiceCard
-                title="Interview Coaching"
-                description="One-on-one coaching to prepare you for job interviews and boost your confidence."
-                icon={<PhoneCall size={32} />}
-                link="/services/interview-coaching"
-              />
+              <ServiceCard title="CV Writing" description="Professionally written CVs tailored to your industry and career goals." icon={<FileText size={32} />} link="/services/cv-writing" />
+              <ServiceCard title="Cover Letter" description="Compelling cover letters that complement your CV and showcase your value." icon={<PenTool size={32} />} link="/services/cover-letter" />
+              <ServiceCard title="LinkedIn Optimization" description="Strategic profile enhancement to increase visibility to recruiters and employers." icon={<Linkedin size={32} />} link="/services/linkedin-optimization" />
+              <ServiceCard title="Interview Coaching" description="One-on-one coaching to prepare you for job interviews and boost your confidence." icon={<PhoneCall size={32} />} link="/services/interview-coaching" />
             </div>
             <div className="text-center mt-12">
               <Link to="/pricing">
@@ -188,16 +160,7 @@ const HomePage = () => {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {testimonials.map((testimonial, index) => (
-                <TestimonialCard 
-                  key={index}
-                  name={testimonial.name}
-                  position={testimonial.position}
-                  testimonial={testimonial.testimonial}
-                  rating={testimonial.rating}
-                  image={testimonial.image}
-                />
-              ))}
+              {testimonials.map((testimonial, index) => <TestimonialCard key={index} name={testimonial.name} position={testimonial.position} testimonial={testimonial.testimonial} rating={testimonial.rating} image={testimonial.image} />)}
             </div>
             <div className="text-center mt-12">
               <Link to="/testimonials">
@@ -236,8 +199,6 @@ const HomePage = () => {
         </section>
       </main>
       <Footer />
-    </>
-  );
+    </>;
 };
-
 export default HomePage;
