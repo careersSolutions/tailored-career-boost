@@ -16,6 +16,14 @@ import CoverLetter from "./pages/services/CoverLetter";
 import LinkedInOptimization from "./pages/services/LinkedInOptimization";
 import InterviewCoaching from "./pages/services/InterviewCoaching";
 
+// Dashboard imports
+import DashboardLayout from "./components/layouts/DashboardLayout";
+import Dashboard from "./pages/dashboard/Dashboard";
+import Orders from "./pages/dashboard/Orders";
+import CVReviews from "./pages/dashboard/CVReviews";
+import Customers from "./pages/dashboard/Customers";
+import Settings from "./pages/dashboard/Settings";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -37,6 +45,15 @@ const App = () => (
           <Route path="/services/cover-letter" element={<CoverLetter />} />
           <Route path="/services/linkedin-optimization" element={<LinkedInOptimization />} />
           <Route path="/services/interview-coaching" element={<InterviewCoaching />} />
+          
+          {/* Dashboard Routes */}
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="cv-reviews" element={<CVReviews />} />
+            <Route path="customers" element={<Customers />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
