@@ -35,42 +35,14 @@ import Settings from "./pages/dashboard/Settings";
 
 const queryClient = new QueryClient();
 
-// Initialize Supabase client with fallback values for development
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder-supabase-url.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-anon-key';
+// Initialize Supabase client with the provided credentials
+const supabaseUrl = "https://qjboemhffxyuddtwkyin.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqYm9lbWhmZnh5dWRkdHdreWluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM1OTQ0MzksImV4cCI6MjA1OTE3MDQzOX0.UI_COubAoMovm8ffJWP1H-RObbS8NP7pntMeCIvpEY4";
 
-// Create Supabase client only if both URL and key are provided (and not fallbacks)
+// Create Supabase client
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Simple component to show when Supabase credentials are missing
-const SupabaseConfigMissing = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
-    <h1 className="text-2xl font-bold mb-4">Supabase Configuration Missing</h1>
-    <p className="mb-4">
-      The application requires Supabase credentials to function properly.
-      Please set the following environment variables:
-    </p>
-    <ul className="list-disc text-left mb-6 inline-block">
-      <li><code>VITE_SUPABASE_URL</code> - Your Supabase project URL</li>
-      <li><code>VITE_SUPABASE_ANON_KEY</code> - Your Supabase anonymous key</li>
-    </ul>
-    <p>
-      These can be found in your Supabase project settings under "API".
-    </p>
-  </div>
-);
-
 const App = () => {
-  // Check if we have real Supabase credentials (not our fallbacks)
-  const hasValidSupabaseConfig = 
-    supabaseUrl !== 'https://placeholder-supabase-url.supabase.co' && 
-    supabaseAnonKey !== 'placeholder-anon-key';
-
-  // If we don't have valid credentials, show the config missing page
-  if (!hasValidSupabaseConfig) {
-    return <SupabaseConfigMissing />;
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <SessionContextProvider supabaseClient={supabase}>

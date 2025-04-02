@@ -1,21 +1,13 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { EyeIcon, MoreHorizontal } from 'lucide-react';
-
-const orderData = [
-  { id: '001', customer: 'John Smith', date: '2023-10-15', service: 'CV Writing', price: '$99.99', status: 'Completed' },
-  { id: '002', customer: 'Jane Doe', date: '2023-10-16', service: 'Cover Letter', price: '$49.99', status: 'In Progress' },
-  { id: '003', customer: 'Michael Johnson', date: '2023-10-17', service: 'LinkedIn Optimization', price: '$149.99', status: 'Pending' },
-  { id: '004', customer: 'Emily Wilson', date: '2023-10-18', service: 'Interview Coaching', price: '$199.99', status: 'Completed' },
-  { id: '005', customer: 'David Brown', date: '2023-10-19', service: 'CV Writing', price: '$99.99', status: 'In Progress' },
-  { id: '006', customer: 'Sarah Miller', date: '2023-10-20', service: 'Cover Letter', price: '$49.99', status: 'Pending' },
-  { id: '007', customer: 'Robert Davis', date: '2023-10-21', service: 'LinkedIn Optimization', price: '$149.99', status: 'Completed' },
-  { id: '008', customer: 'Jennifer Garcia', date: '2023-10-22', service: 'Interview Coaching', price: '$199.99', status: 'In Progress' },
-];
+import { EyeIcon, MoreHorizontal, RefreshCw } from 'lucide-react';
+import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
+import { Order } from '@/utils/supabaseClient';
+import { toast } from '@/components/ui/use-toast';
 
 const StatusBadge = ({ status }: { status: string }) => {
   let colorClass = '';
@@ -38,51 +30,97 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 const Orders = () => {
+  const user = useUser();
+  const supabase = useSupabaseClient();
+  const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      loadOrders();
+    }
+  }, [user]);
+
+  const loadOrders = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false });
+        
+      if (error) throw error;
+      setOrders(data || []);
+    } catch (error: any) {
+      console.error('Error loading orders:', error);
+      toast({
+        title: "Error loading orders",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Orders</CardTitle>
-          <Button variant="outline">Export</Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={loadOrders} disabled={loading}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+            <Button variant="outline">Export</Button>
+          </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Service</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {orderData.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell>#{order.id}</TableCell>
-                  <TableCell>{order.customer}</TableCell>
-                  <TableCell>{order.date}</TableCell>
-                  <TableCell>{order.service}</TableCell>
-                  <TableCell>{order.price}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={order.status} />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon">
-                        <EyeIcon className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+          {loading ? (
+            <div className="flex justify-center p-8">Loading orders...</div>
+          ) : orders.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Order ID</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Service</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {orders.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell>#{order.id.substring(0, 8)}</TableCell>
+                    <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell>{order.service}</TableCell>
+                    <TableCell>${order.price.toFixed(2)}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={order.status} />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="icon">
+                          <EyeIcon className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              You haven't placed any orders yet.
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

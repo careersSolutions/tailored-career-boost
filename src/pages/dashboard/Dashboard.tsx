@@ -1,44 +1,137 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ArrowUpRight, FileText, ShoppingCart, Users } from 'lucide-react';
-
-const data = [
-  { name: 'Jan', value: 12 },
-  { name: 'Feb', value: 19 },
-  { name: 'Mar', value: 15 },
-  { name: 'Apr', value: 25 },
-  { name: 'May', value: 32 },
-  { name: 'Jun', value: 28 },
-];
+import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
+import { Order, CVReview } from '@/utils/supabaseClient';
+import { toast } from '@/components/ui/use-toast';
 
 const Dashboard = () => {
+  const user = useUser();
+  const supabase = useSupabaseClient();
+  const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [reviews, setReviews] = useState<CVReview[]>([]);
+  const [recentActivity, setRecentActivity] = useState<Array<{ type: 'order' | 'review', id: string, time: string }>>([]);
+  const [monthlyData, setMonthlyData] = useState([]);
+
+  useEffect(() => {
+    if (user) {
+      loadDashboardData();
+    }
+  }, [user]);
+
+  const loadDashboardData = async () => {
+    setLoading(true);
+    try {
+      // Get user's orders
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('user_id', user?.id);
+        
+      if (orderError) throw orderError;
+      setOrders(orderData || []);
+      
+      // Get user's CV reviews
+      const { data: reviewData, error: reviewError } = await supabase
+        .from('cv_reviews')
+        .select('*')
+        .eq('user_id', user?.id);
+        
+      if (reviewError) throw reviewError;
+      setReviews(reviewData || []);
+      
+      // Combine and sort recent activity
+      const activity = [
+        ...(orderData || []).map(order => ({
+          type: 'order' as const,
+          id: order.id,
+          time: order.created_at
+        })),
+        ...(reviewData || []).map(review => ({
+          type: 'review' as const,
+          id: review.id,
+          time: review.submitted_at
+        }))
+      ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
+       .slice(0, 5);
+       
+      setRecentActivity(activity);
+      
+      // Create monthly data for chart
+      generateMonthlyData(orderData || []);
+    } catch (error: any) {
+      console.error('Error loading dashboard data:', error);
+      toast({
+        title: "Error loading dashboard data",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const generateMonthlyData = (orderData: Order[]) => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const currentMonth = new Date().getMonth();
+    
+    const last6Months = Array.from({ length: 6 }, (_, i) => {
+      const monthIndex = (currentMonth - i + 12) % 12;
+      return {
+        name: months[monthIndex],
+        value: 0
+      };
+    }).reverse();
+    
+    // Count orders by month
+    orderData.forEach(order => {
+      const orderDate = new Date(order.created_at);
+      const monthIndex = orderDate.getMonth();
+      const monthName = months[monthIndex];
+      
+      const monthData = last6Months.find(m => m.name === monthName);
+      if (monthData) {
+        monthData.value += 1;
+      }
+    });
+    
+    setMonthlyData(last6Months);
+  };
+
+  const getTotalRevenue = () => {
+    if (!orders.length) return "$0";
+    const total = orders.reduce((sum, order) => sum + order.price, 0);
+    return `$${total.toFixed(2)}`;
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="Total Orders" 
-          value="256" 
-          change="+12% from last month" 
+          value={orders.length.toString()}
+          change="Based on your activity" 
           icon={<ShoppingCart className="h-6 w-6" />} 
         />
         <StatCard 
           title="CV Reviews" 
-          value="182" 
-          change="+8% from last month" 
+          value={reviews.length.toString()}
+          change="Based on your submissions" 
           icon={<FileText className="h-6 w-6" />} 
         />
         <StatCard 
-          title="Customers" 
-          value="2,342" 
-          change="+24% from last month" 
+          title="Completed Services" 
+          value={orders.filter(o => o.status === 'Completed').length.toString()}
+          change="Orders completed" 
           icon={<Users className="h-6 w-6" />} 
         />
         <StatCard 
-          title="Revenue" 
-          value="$48,256" 
-          change="+18% from last month" 
+          title="Total Spent" 
+          value={getTotalRevenue()}
+          change="Across all orders" 
           icon={<ArrowUpRight className="h-6 w-6" />} 
         />
       </div>
@@ -55,7 +148,7 @@ const Dashboard = () => {
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={data}
+                  data={monthlyData}
                   margin={{
                     top: 5,
                     right: 30,
@@ -82,21 +175,31 @@ const Dashboard = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50">
-                  <div className={`p-2 rounded-full ${i % 2 === 0 ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'}`}>
-                    {i % 2 === 0 ? <ShoppingCart className="h-5 w-5" /> : <FileText className="h-5 w-5" />}
+            {loading ? (
+              <div className="flex justify-center p-8">Loading activity...</div>
+            ) : recentActivity.length > 0 ? (
+              <div className="space-y-4">
+                {recentActivity.map((activity, index) => (
+                  <div key={index} className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50">
+                    <div className={`p-2 rounded-full ${activity.type === 'order' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'}`}>
+                      {activity.type === 'order' ? <ShoppingCart className="h-5 w-5" /> : <FileText className="h-5 w-5" />}
+                    </div>
+                    <div>
+                      <p className="font-medium">
+                        {activity.type === 'order' ? 'New order' : 'CV Review'} #{activity.id.substring(0, 8)}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(activity.time).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">
-                      {i % 2 === 0 ? 'New order' : 'CV Review completed'} #{1000 + i}
-                    </p>
-                    <p className="text-sm text-gray-500">{Math.floor(i * 10)} minutes ago</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No recent activity to display
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
