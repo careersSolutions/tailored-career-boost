@@ -32,8 +32,10 @@ import DashboardLayout from "./components/layouts/DashboardLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Orders from "./pages/dashboard/Orders";
 import CVReviews from "./pages/dashboard/CVReviews";
+import CVReviewDetail from "./pages/dashboard/CVReviewDetail";
 import Customers from "./pages/dashboard/Customers";
 import Settings from "./pages/dashboard/Settings";
+import UserDashboard from "./pages/dashboard/UserDashboard";
 
 const queryClient = new QueryClient();
 
@@ -73,9 +75,10 @@ const App = () => {
                     <DashboardLayout />
                   </ProtectedRoute>
                 }>
-                  <Route index element={<Dashboard />} />
+                  <Route index element={<UserDashboard />} />
                   <Route path="orders" element={<Orders />} />
                   <Route path="cv-reviews" element={<CVReviews />} />
+                  <Route path="cv-reviews/:reviewId" element={<CVReviewDetail />} />
                   <Route path="customers" element={<Customers />} />
                   <Route path="settings" element={<Settings />} />
                 </Route>
