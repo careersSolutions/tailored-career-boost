@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,12 +45,20 @@ const CVUploadForm = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: user?.user_metadata?.name || '',
-      email: user?.email || '',
+      name: '',
+      email: '',
       phone: '',
       message: '',
     },
   });
+
+  // Update form values when user data is available
+  useEffect(() => {
+    if (user) {
+      form.setValue('name', user.user_metadata?.name || '');
+      form.setValue('email', user.email || '');
+    }
+  }, [user, form]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -86,6 +94,11 @@ const CVUploadForm = () => {
     });
 
     if (result.success) {
+      toast({
+        title: "CV submitted successfully",
+        description: "We'll review your CV and get back to you soon!",
+      });
+      navigate('/dashboard');
       form.reset();
       setFile(null);
     }

@@ -1,12 +1,21 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { CheckCircle, FileText, PenTool, Linkedin, PhoneCall, ChevronRight, FileCheck } from 'lucide-react';
 import ServiceCard from '@/components/ServiceCard';
 import TestimonialCard from '@/components/TestimonialCard';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+
 const HomePage = () => {
+  const navigate = useNavigate();
+  
+  // Handle navigation with proper scroll behavior
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    window.scrollTo(0, 0);
+  };
+  
   // Sample testimonials data
   const testimonials = [{
     name: "Sarah Johnson",
@@ -27,6 +36,7 @@ const HomePage = () => {
     rating: 4,
     image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
   }];
+
   return <>
       <Header />
       <main>
@@ -42,16 +52,19 @@ const HomePage = () => {
                 Stand out in today's competitive job market with our expert-crafted CVs, cover letters, and career services.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Link to="/cv-review">
-                  <Button className="bg-cs-gold text-cs-navy hover:bg-cs-gold/90 px-8 py-6 text-lg w-full sm:w-auto">
-                    Free CV Review
-                  </Button>
-                </Link>
-                <Link to="/services/cv-writing">
-                  <Button variant="outline" className="border-white px-8 py-6 w-full sm:w-auto text-lg text-slate-950 bg-sky-300 hover:bg-sky-200">
-                    Our Services
-                  </Button>
-                </Link>
+                <Button 
+                  className="bg-cs-gold text-cs-navy hover:bg-cs-gold/90 px-8 py-6 text-lg w-full sm:w-auto"
+                  onClick={() => handleNavigation('/cv-review')}
+                >
+                  Free CV Review
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="border-white px-8 py-6 w-full sm:w-auto text-lg text-slate-950 bg-sky-300 hover:bg-sky-200"
+                  onClick={() => handleNavigation('/services/cv-writing')}
+                >
+                  Our Services
+                </Button>
               </div>
               <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
@@ -183,16 +196,19 @@ const HomePage = () => {
                 Join thousands of successful professionals who have transformed their careers with our expert services.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Link to="/cv-review">
-                  <Button className="bg-cs-gold text-cs-navy hover:bg-cs-gold/90 px-8 py-6 text-lg w-full sm:w-auto">
-                    Get Free CV Review
-                  </Button>
-                </Link>
-                <Link to="/contact">
-                  <Button variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-6 text-lg w-full sm:w-auto">
-                    Contact Us
-                  </Button>
-                </Link>
+                <Button 
+                  className="bg-cs-gold text-cs-navy hover:bg-cs-gold/90 px-8 py-6 text-lg w-full sm:w-auto"
+                  onClick={() => handleNavigation('/cv-review')}
+                >
+                  Get Free CV Review
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="border-white text-white hover:bg-white/10 px-8 py-6 text-lg w-full sm:w-auto"
+                  onClick={() => handleNavigation('/contact')}
+                >
+                  Contact Us
+                </Button>
               </div>
             </div>
           </div>
@@ -201,4 +217,5 @@ const HomePage = () => {
       <Footer />
     </>;
 };
+
 export default HomePage;

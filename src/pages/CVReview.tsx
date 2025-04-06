@@ -1,11 +1,18 @@
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CVUploadForm from '@/components/CVUploadForm';
 import { CheckCircle, ArrowRight } from 'lucide-react';
+import { useUser } from '@supabase/auth-helpers-react';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 const CVReview = () => {
+  const user = useUser();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
   const benefits = [
     "Detailed analysis of your current CV",
     "Identification of strengths and improvement areas",
@@ -14,6 +21,17 @@ const CVReview = () => {
     "Actionable advice to increase interview chances",
     "Quick turnaround time (within 48 hours)"
   ];
+
+  const handleCVReviewAccess = () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to submit your CV for review",
+        variant: "destructive",
+      });
+      navigate('/sign-in', { state: { from: '/cv-review' } });
+    }
+  };
 
   return (
     <>
@@ -43,7 +61,19 @@ const CVReview = () => {
               {/* Form Section */}
               <div className="bg-white rounded-lg shadow-lg p-8">
                 <h2 className="text-2xl font-bold mb-6 text-cs-navy">Upload Your CV</h2>
-                <CVUploadForm />
+                {user ? (
+                  <CVUploadForm />
+                ) : (
+                  <div className="text-center p-6">
+                    <p className="mb-4">Please sign in to submit your CV for review</p>
+                    <Button 
+                      onClick={() => navigate('/sign-in', { state: { from: '/cv-review' } })}
+                      className="bg-cs-navy hover:bg-cs-navy/90"
+                    >
+                      Sign In
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {/* Benefits Section */}
