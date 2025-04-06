@@ -7,31 +7,55 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { toast } from '@/components/ui/use-toast';
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+const signInSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+});
+
+type SignInValues = z.infer<typeof signInSchema>;
 
 const SignIn = () => {
   const supabase = useSupabaseClient();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const form = useForm<SignInValues>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const handleSignIn = async (values: SignInValues) => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const { error, data } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
       });
 
       if (error) throw error;
 
-      // Success will automatically redirect due to the session change
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
       });
+
+      navigate('/dashboard');
     } catch (error: any) {
       console.error('Sign in error:', error);
       toast({
@@ -53,39 +77,53 @@ const SignIn = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <form onSubmit={handleSignIn} className="space-y-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              placeholder="m@example.com"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSignIn)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="m@example.com"
+                      type="email"
+                      autoComplete="email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
-              <Link to="/reset-password" className="text-sm text-blue-600 hover:text-blue-800">
-                Forgot password?
-              </Link>
-            </div>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center justify-between">
+                    <FormLabel>Password</FormLabel>
+                    <Link to="/reset-password" className="text-sm text-blue-600 hover:text-blue-800">
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      autoComplete="current-password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <Button disabled={isLoading} type="submit" className="w-full">
-            {isLoading ? "Signing in..." : "Sign In"}
-          </Button>
-        </form>
+            <Button disabled={isLoading} type="submit" className="w-full">
+              {isLoading ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
+        </Form>
       </CardContent>
       <CardFooter>
         <p className="text-center text-sm text-gray-600 mt-2 w-full">

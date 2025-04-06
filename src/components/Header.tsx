@@ -1,125 +1,115 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
+import { useMobile } from "@/hooks/use-mobile";
+import UserProfileMenu from "@/components/UserProfileMenu";
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [servicesOpen, setServicesOpen] = useState(false);
+  const isMobile = useMobile();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const toggleOpen = () => setIsOpen(prev => !prev);
+  const closeMenu = () => setIsOpen(false);
 
-  const toggleServices = () => {
-    setServicesOpen(!servicesOpen);
-  };
+  const navigation = [
+    { name: "Home", href: "/" },
+    { name: "Services", href: "#", submenu: true, submenuItems: [
+      { name: "CV Writing", href: "/services/cv-writing" },
+      { name: "Cover Letter", href: "/services/cover-letter" },
+      { name: "LinkedIn Optimization", href: "/services/linkedin-optimization" },
+      { name: "Interview Coaching", href: "/services/interview-coaching" },
+    ]},
+    { name: "CV Review", href: "/cv-review" },
+    { name: "Pricing", href: "/pricing" },
+    { name: "About", href: "/about" },
+    { name: "Blog", href: "/blog" },
+    { name: "Contact", href: "/contact" },
+  ];
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <h1 className="text-cs-navy font-serif font-bold text-2xl">CAREER SOLUTIONS</h1>
+    <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+      <div className="container flex h-16 items-center justify-between space-x-4 sm:space-x-0">
+        <div className="flex gap-6 md:gap-10">
+          <Link to="/" className="items-center space-x-2 flex">
+            <span className="font-bold text-xl tracking-tight">CareerSolutions</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8 items-center">
-            <Link to="/" className="text-cs-gray hover:text-cs-navy font-medium transition-colors">Home</Link>
-            
-            {/* Services dropdown */}
-            <div className="relative group">
-              <button 
-                className="flex items-center text-cs-gray hover:text-cs-navy font-medium transition-colors"
-                onClick={() => setServicesOpen(!servicesOpen)}
-              >
-                Services <ChevronDown className="ml-1 h-4 w-4" />
-              </button>
-              <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                <div className="py-1" role="menu" aria-orientation="vertical">
-                  <Link to="/services/cv-writing" className="block px-4 py-2 text-sm text-cs-gray hover:bg-cs-light hover:text-cs-navy" role="menuitem">CV Writing</Link>
-                  <Link to="/services/cover-letter" className="block px-4 py-2 text-sm text-cs-gray hover:bg-cs-light hover:text-cs-navy" role="menuitem">Cover Letter</Link>
-                  <Link to="/services/linkedin-optimization" className="block px-4 py-2 text-sm text-cs-gray hover:bg-cs-light hover:text-cs-navy" role="menuitem">LinkedIn Optimization</Link>
-                  <Link to="/services/interview-coaching" className="block px-4 py-2 text-sm text-cs-gray hover:bg-cs-light hover:text-cs-navy" role="menuitem">Interview Coaching</Link>
+          {!isMobile && (
+            <nav className="hidden md:flex gap-6">
+              {navigation.map((item) => (
+                <div key={item.name} className="relative group">
+                  <Link
+                    to={item.href}
+                    className="flex items-center text-lg font-medium transition-colors hover:text-primary"
+                  >
+                    {item.name}
+                  </Link>
+                  {item.submenu && (
+                    <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-300">
+                      {item.submenuItems?.map((subItem) => (
+                        <Link
+                          key={subItem.name}
+                          to={subItem.href}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          {subItem.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
-            </div>
-            
-            <Link to="/cv-review" className="text-cs-gray hover:text-cs-navy font-medium transition-colors">Free CV Review</Link>
-            <Link to="/pricing" className="text-cs-gray hover:text-cs-navy font-medium transition-colors">Pricing</Link>
-            <Link to="/about" className="text-cs-gray hover:text-cs-navy font-medium transition-colors">About Us</Link>
-            <Link to="/blog" className="text-cs-gray hover:text-cs-navy font-medium transition-colors">Blog</Link>
-            <Link to="/contact" className="text-cs-gray hover:text-cs-navy font-medium transition-colors">Contact</Link>
-          </nav>
+              ))}
+            </nav>
+          )}
+        </div>
 
-          {/* Action Buttons */}
-          <div className="hidden md:flex space-x-4 items-center">
-            <Link to="/">
-              <Button variant="outline" className="border-cs-navy text-cs-navy hover:bg-cs-navy hover:text-white">Login</Button>
-            </Link>
-            <Link to="/cv-review">
-              <Button className="bg-cs-gold text-cs-navy hover:bg-cs-gold/90">Free CV Review</Button>
-            </Link>
-          </div>
-
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden focus:outline-none"
-            onClick={toggleMenu}
-          >
-            {isMenuOpen ? (
-              <X className="h-6 w-6 text-cs-navy" />
-            ) : (
-              <Menu className="h-6 w-6 text-cs-navy" />
-            )}
-          </button>
+        <div className="flex items-center gap-2">
+          <UserProfileMenu />
+          
+          {isMobile && (
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" className="md:hidden" size="icon">
+                  <Menu />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right">
+                <div className="grid gap-2 py-6">
+                  {navigation.map((item) => (
+                    <div key={item.name} className="px-2">
+                      <Link
+                        to={item.href}
+                        className="block text-lg font-medium p-2"
+                        onClick={closeMenu}
+                      >
+                        {item.name}
+                      </Link>
+                      {item.submenu && (
+                        <div className="ml-4 my-1 space-y-1">
+                          {item.submenuItems?.map((subItem) => (
+                            <Link
+                              key={subItem.name}
+                              to={subItem.href}
+                              className="block text-base p-2 text-muted-foreground hover:text-foreground"
+                              onClick={closeMenu}
+                            >
+                              {subItem.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
         </div>
       </div>
-
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white px-4 pt-2 pb-4 border-t">
-          <nav className="flex flex-col space-y-4">
-            <Link to="/" className="text-cs-gray hover:text-cs-navy font-medium transition-colors" onClick={toggleMenu}>Home</Link>
-            
-            {/* Services dropdown mobile */}
-            <div>
-              <button 
-                className="flex items-center text-cs-gray hover:text-cs-navy font-medium transition-colors w-full text-left"
-                onClick={toggleServices}
-              >
-                Services <ChevronDown className={`ml-1 h-4 w-4 transform transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
-              </button>
-              
-              {servicesOpen && (
-                <div className="pl-4 pt-2 flex flex-col space-y-2">
-                  <Link to="/services/cv-writing" className="text-sm text-cs-gray hover:text-cs-navy" onClick={toggleMenu}>CV Writing</Link>
-                  <Link to="/services/cover-letter" className="text-sm text-cs-gray hover:text-cs-navy" onClick={toggleMenu}>Cover Letter</Link>
-                  <Link to="/services/linkedin-optimization" className="text-sm text-cs-gray hover:text-cs-navy" onClick={toggleMenu}>LinkedIn Optimization</Link>
-                  <Link to="/services/interview-coaching" className="text-sm text-cs-gray hover:text-cs-navy" onClick={toggleMenu}>Interview Coaching</Link>
-                </div>
-              )}
-            </div>
-            
-            <Link to="/cv-review" className="text-cs-gray hover:text-cs-navy font-medium transition-colors" onClick={toggleMenu}>Free CV Review</Link>
-            <Link to="/pricing" className="text-cs-gray hover:text-cs-navy font-medium transition-colors" onClick={toggleMenu}>Pricing</Link>
-            <Link to="/about" className="text-cs-gray hover:text-cs-navy font-medium transition-colors" onClick={toggleMenu}>About Us</Link>
-            <Link to="/blog" className="text-cs-gray hover:text-cs-navy font-medium transition-colors" onClick={toggleMenu}>Blog</Link>
-            <Link to="/contact" className="text-cs-gray hover:text-cs-navy font-medium transition-colors" onClick={toggleMenu}>Contact</Link>
-            
-            <div className="pt-2 flex flex-col space-y-3">
-              <Link to="/" onClick={toggleMenu}>
-                <Button variant="outline" className="w-full border-cs-navy text-cs-navy hover:bg-cs-navy hover:text-white">Login</Button>
-              </Link>
-              <Link to="/cv-review" onClick={toggleMenu}>
-                <Button className="w-full bg-cs-gold text-cs-navy hover:bg-cs-gold/90">Free CV Review</Button>
-              </Link>
-            </div>
-          </nav>
-        </div>
-      )}
     </header>
   );
 };

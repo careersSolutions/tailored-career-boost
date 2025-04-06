@@ -16,3 +16,15 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     autoRefreshToken: true,
   }
 });
+
+export type Profile = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  avatar_url: string | null;
+  company: string | null;
+  position: string | null;
+  phone: string | null;
+  created_at: string;
+  updated_at: string;
+};
