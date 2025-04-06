@@ -46,6 +46,7 @@ interface ReviewWithUser {
   reviewer_id: string | null;
   cv_url: string;
   feedback: string | null;
+  updated_at: string;
   profiles: {
     name: string | null;
     email: string | null;
