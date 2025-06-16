@@ -24,6 +24,7 @@ import InterviewCoaching from "./pages/services/InterviewCoaching";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
 import ResetPassword from "./pages/auth/ResetPassword";
+import UpdatePassword from "./pages/auth/UpdatePassword";
 import AuthLayout from "./components/layouts/AuthLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -68,6 +69,7 @@ const App = () => {
                   <Route path="/sign-in" element={<SignIn />} />
                   <Route path="/sign-up" element={<SignUp />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/update-password" element={<UpdatePassword />} />
                 </Route>
                 
                 {/* Dashboard Routes */}
