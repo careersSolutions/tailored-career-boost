@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Download, Eye, MoreHorizontal } from 'lucide-react';
 import { useCVReview } from '@/hooks/useCVReview';
+import { useUser } from '@supabase/auth-helpers-react';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -55,6 +56,7 @@ interface ReviewWithUser {
 
 const CVReviews = () => {
   const { fetchAllCVReviews, updateCVReviewStatus, provideFeedback, assignReviewer } = useCVReview();
+  const user = useUser();
   const [reviews, setReviews] = useState<ReviewWithUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -104,9 +106,8 @@ const CVReviews = () => {
   };
 
   const handleAssignReviewer = async (id: string) => {
-    // In a real application, you would show a UI to select a reviewer
-    // For this example, we'll just use the current user as the reviewer
-    const success = await assignReviewer(id, 'current-user-id');
+    if (!user) return;
+    const success = await assignReviewer(id, user.id);
     if (success) {
       loadCVReviews();
     }
@@ -224,7 +225,10 @@ const CVReviews = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             {review.status === 'Pending' && (
-                              <DropdownMenuItem onClick={() => handleAssignReviewer(review.id)}>
+                              <DropdownMenuItem
+                                onClick={() => handleAssignReviewer(review.id)}
+                                disabled={!user}
+                              >
                                 Assign to Me
                               </DropdownMenuItem>
                             )}
