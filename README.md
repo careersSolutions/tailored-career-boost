@@ -52,7 +52,7 @@ npm run dev
 
 ## What technologies are used for this project?
 
-This project is built with .
+This project is built with the following technologies:
 
 - Vite
 - TypeScript
@@ -66,7 +66,7 @@ Simply open [Lovable](https://lovable.dev/projects/db33505c-786e-41ed-9c9f-47f49
 
 ## Can I connect a custom domain to my Lovable project?
 
-Yes it is!
+Yes, you can!
 
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
